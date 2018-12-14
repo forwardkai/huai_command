@@ -77,29 +77,31 @@ class mytest extends Command
             $this->info('执行完成, 本次添加豆儿'.$number);
         } elseif($type == 'game') {
             $this->info('答题已就绪');
-            $game_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/1/start',[],'get');
-            $game_data = json_decode($game_data);
-            if(isset($game_data->data->data->house_id)) {
-                $this->info($game_data->data->data->house_id);
-                $question_id = $game_data->data->data->house_id;
-                $question_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/question/list',[],'get');
-                $question_data = json_decode($question_data);
-                if(isset($question_data->data->data)) {
-                    foreach ($question_data->data->data as $v) {
-                        foreach ($v->options as $v1) {
-                            if(isset($v1->is_right) && $v1->is_right == 1) {
-                                $answer_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/submit/'.$v1->bank_id.'/'.$v1->id,[],'get');
-                                $answer_data = json_decode($answer_data);
-                                $this->info($answer_data->data->message);
+            for ($game_num = 0;$game_num<=4;$game_num++) {
+                $game_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/1/start',[],'get');
+                $game_data = json_decode($game_data);
+                if(isset($game_data->data->data->house_id)) {
+                    $this->info($game_data->data->data->house_id);
+                    $question_id = $game_data->data->data->house_id;
+                    $question_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/question/list',[],'get');
+                    $question_data = json_decode($question_data);
+                    if(isset($question_data->data->data)) {
+                        foreach ($question_data->data->data as $v) {
+                            foreach ($v->options as $v1) {
+                                if(isset($v1->is_right) && $v1->is_right == 1) {
+                                    $answer_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/submit/'.$v1->bank_id.'/'.$v1->id,[],'get');
+                                    $answer_data = json_decode($answer_data);
+                                    $this->info($answer_data->data->message);
+                                }
                             }
                         }
+                        $answer_res_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/finished',[],'get');
+                        $answer_res_data = json_decode($answer_res_data);
+                        $this->info($answer_res_data->data->data->message);
                     }
-                    $answer_res_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/finished',[],'get');
-                    $answer_res_data = json_decode($answer_res_data);
-                    $this->info($answer_res_data->data->data->message);
+                } else {
+                    $this->info('任务已达上限');
                 }
-            } else {
-                $this->info('任务已达上限');
             }
         } elseif($type == 'steal') {
             $this->info('魔豆偷取已就绪');
