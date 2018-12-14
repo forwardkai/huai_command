@@ -101,9 +101,22 @@ class mytest extends Command
             } else {
                 $this->info('任务已达上限');
             }
-        } elseif($type == 'other_user') {
-            $this->info('魔力偷取已就绪');
-            for($id=1;$id<=200;$id++) {
+        } elseif($type == 'steal') {
+            $this->info('魔豆偷取已就绪');
+            for($i=2;$i<=10;$i++) {
+                $top_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/top',['page'=>$i]);
+                $top_data = json_decode($top_data);
+                if($top_data->data->error !== 0) return 'error';
+                $user_ids = [];
+                foreach ($top_data->data->data->data as $v) {
+                    $user_ids[] = $v->id;
+                }
+            }
+//            for ($num = 1; $num<=100;$num++) {
+//                $user_ids[] = $num;
+//            }
+            if(!isset($user_ids)) return 'error2';
+            foreach ($user_ids as $id) {
                 $user_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/coin/steal/info',['other_user_id'=>$id]);
                 if(!$user_data) {
                     return '用户信息获取失败';exit;
@@ -114,14 +127,16 @@ class mytest extends Command
                     $follow_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/follow',['follow_id' => $user_id]);//关注
                     $follow_data = json_decode($follow_data);
                     if($follow_data->data->error != 0) $this->info($follow_data->message);
+                    $this->info('关注'.$user_data->data->data->user_info->name.'/'.$user_data->data->data->user_info->name.'成功,开始摘取魔豆');
                 }
-                foreach ($user_data->data->data->coin as $v) {
-                    $coin_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/coin/steal/get',['coin_id' => $v->id]);//偷取
+                $coin_first = [];
+                if($user_data->data->data->coin) $coin_first = array_shift($user_data->data->data->coin);
+                if($coin_first) {
+                    $coin_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/coin/steal/get',['coin_id' => $coin_first->id]);//偷取
                     $coin_data = json_decode($coin_data);
-                    $this->info("偷取".$v->id."号魔豆成功");
+                    if($coin_data !== null && $coin_data->data->error == 0) $this->info("摘取".$v->id."号魔豆成功");
                 }
             }
-
         }
         $this->info('执行完成');
     }
