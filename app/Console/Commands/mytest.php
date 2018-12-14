@@ -46,11 +46,10 @@ class mytest extends Command
      * @return mixed
      */
     public function handle() {
-
         $type = filter($this->option('type'),'s');
-        if($type == 'moli') {
+        if($type == 'article') {
             $this->info('文章阅读已就绪');
-            for($i=1;$i<=200;$i++) {
+            for($i=200;$i<=500;$i++) {
                 $result = self::curl('http://huai.huaishutech.com/v1.2/api/articles/'.$i.'/info',[],'get');
                 $result = json_decode($result);
                 if(isset($result->code) && isset($result->data->message) ) {
