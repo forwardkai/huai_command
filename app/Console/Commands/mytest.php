@@ -27,7 +27,7 @@ class mytest extends Command
      *
      * @var string
      */
-    protected $description = '槐界安全测试脚本';
+    protected $description = '槐界安全测试脚本article文章获取魔力 modou 收取自己魔豆 game 答题游戏 steal 魔豆偷取';
 
     /**
      * Create a new command instance.
@@ -47,16 +47,8 @@ class mytest extends Command
      */
     public function handle() {
         $type = filter($this->option('type'),'s');
-        if($type == 'article') {
-            $this->info('文章阅读已就绪');
-            for($i=200;$i<=500;$i++) {
-                $result = self::curl('http://huai.huaishutech.com/v1.2/api/articles/'.$i.'/info',[],'get');
-                $result = json_decode($result);
-                if(isset($result->code) && isset($result->data->message) ) {
-                    $this->info($i .':'.$result->data->message);
-                }
-            }
-        } elseif($type == 'modou') {
+        $type = explode(',', $type);
+        if(in_array('modou',$type)) {
             $this->info('魔豆收取已就绪');
             $huaijie_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/info',[],'get');
             $huaijie_data = json_decode($huaijie_data);
@@ -74,7 +66,8 @@ class mytest extends Command
                 $this->info($huaijie_data->data->message);
             }
             $this->info('执行完成, 本次添加豆儿'.$number);
-        } elseif($type == 'game') {
+        }
+        if(in_array('game',$type)) {
             $this->info('答题已就绪');
             for ($game_num = 0;$game_num<=4;$game_num++) {
                 $game_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/1/start',[],'get');
@@ -102,7 +95,8 @@ class mytest extends Command
                     $this->info('任务已达上限');
                 }
             }
-        } elseif($type == 'steal') {
+        }
+        if(in_array('steal',$type)) {
             $this->info('魔豆偷取已就绪');
             for($i=2;$i<=10;$i++) {
                 $top_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/top',['page'=>$i]);
@@ -113,9 +107,6 @@ class mytest extends Command
                     $user_ids[] = $v->id;
                 }
             }
-//            for ($num = 1; $num<=100;$num++) {
-//                $user_ids[] = $num;
-//            }
             if(!isset($user_ids)) return 'error2';
             foreach ($user_ids as $id) {
                 $user_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/coin/steal/info',['other_user_id'=>$id]);
@@ -135,7 +126,17 @@ class mytest extends Command
                 if($coin_first) {
                     $coin_data = self::curl('http://huai.huaishutech.com/v1.2/api/user/coin/steal/get',['coin_id' => $coin_first->id]);//偷取
                     $coin_data = json_decode($coin_data);
-                    if($coin_data !== null && $coin_data->data->error == 0) $this->info("摘取".$v->id."号魔豆成功");
+                    if($coin_data !== null && $coin_data->data->error == 0) $this->info("摘取".$coin_first->id."号魔豆成功");
+                }
+            }
+        }
+        if(in_array('article',$type)) {
+            $this->info('文章阅读已就绪');
+            for($i=0;$i<=300;$i++) {
+                $result = self::curl('http://huai.huaishutech.com/v1.2/api/articles/'.$i.'/info',[],'get');
+                $result = json_decode($result);
+                if(isset($result->code) && isset($result->data->message) ) {
+                    $this->info($i .':'.$result->data->message);
                 }
             }
         }
@@ -182,8 +183,5 @@ class mytest extends Command
             echo  curl_error($curl) ;
         }
         return $result;
-    }//方法的结束符
-//            'access-token: 424080304a256f645571bace668d26ef',
-//            'app-key: e8c7b457c40c1eb0'
-
+    }
 }
