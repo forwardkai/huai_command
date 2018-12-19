@@ -38,6 +38,7 @@ class mytest extends Command
         parent::__construct();
     }
 
+    protected $all_type = 'modou,game,steal,article';//所有类型
     protected $start_number = 0;//搜索开始ID
     protected $number_of_data = 1000;//每次获取数量
 
@@ -47,10 +48,7 @@ class mytest extends Command
      */
     public function handle() {
         $type = filter($this->option('type'),'s');
-        if(empty($type)) $type = 'modou,game,steal,article';
-        $result = self::curl('http://huai.huaishutech.com/v1.2/api/activity/prize/one',['id'=>1,'prise'=>5]);
-        if($result) $result = json_decode($result);
-
+        if(empty($type)) $type = $this->all_type;
         $type = explode(',', $type);
         if(in_array('modou',$type)) {
             $this->info('魔豆收取已就绪');
