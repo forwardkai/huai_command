@@ -101,7 +101,7 @@ class mytest extends Command
         }
         if(in_array('steal',$type)) {
             $this->info('魔豆偷取已就绪');
-            for($i=1;$i<=10;$i++) {
+            for($i=10;$i<=30;$i++) {
                 $top_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/top',['page'=>$i]);
                 $top_data = json_decode($top_data);
                 if($top_data->data->error !== 0) return 'error';
