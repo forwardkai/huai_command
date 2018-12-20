@@ -19,7 +19,7 @@ class mytest extends Command
      *
      * @var string
      */
-    protected $signature = 'huaijie:test {--type=}';
+    protected $signature = 'huaijie {--type=}';
 
     /**
      * 2. 这里填写命令行的描述, 当执行 `php artisan` 时
