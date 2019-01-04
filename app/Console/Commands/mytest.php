@@ -38,7 +38,7 @@ class mytest extends Command
         parent::__construct();
     }
 
-    protected $all_type = 'modou,game,steal,article';//所有类型
+    protected $all_type = 'modou,game,steal,luck_draw,article';//所有类型
     protected $start_number = 0;//搜索开始ID
     protected $number_of_data = 1000;//每次获取数量
 
@@ -97,6 +97,23 @@ class mytest extends Command
                 } else {
                     $this->info('任务已达上限');
                 }
+            }
+        }
+        if(in_array('luck_draw',$type)) {
+            $this->info('抽奖已就绪');
+            for ($i=1;$i<=3;$i++) {
+                $this->info("第 $i 次");
+                $result = self::curl('http://huai.huaishutech.com/v1.2/api/activity/prize/one',['id'=>1,'prise'=>5]);
+                if($result) $result = json_decode($result);
+                $luck_draw_res_message = '';
+                if(isset($result->data->data)) {
+                    $luck_draw_res = isset($result->data->data) ? $result->data->data : [];
+                    if($luck_draw_res) {
+                        $luck_draw_res = array_shift($luck_draw_res);
+                        $luck_draw_res_message = isset($luck_draw_res->prize_name) ? $luck_draw_res->prize_name : '';
+                    }
+                }
+                $this->info('抽奖成功,获取'.$luck_draw_res_message);
             }
         }
         if(in_array('steal',$type)) {
