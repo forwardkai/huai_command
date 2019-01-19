@@ -55,6 +55,7 @@ class mytest extends Command
             $huaijie_data = self::curl('http://huai.huaishutech.com/v1.2/api/coin/info',[],'get');
             $huaijie_data = json_decode($huaijie_data);
             $number = 0;
+            if(!isset($huaijie_data->data->message)) return '数据异常';
             if($huaijie_data->data->message == 'Not Login') return 'Not Login';
             if(isset($huaijie_data->data->data)) {
                 foreach ($huaijie_data->data->data as $v) {
@@ -86,13 +87,13 @@ class mytest extends Command
                                 if(isset($v1->is_right) && $v1->is_right == 1) {
                                     $answer_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/submit/'.$v1->bank_id.'/'.$v1->id,[],'get');
                                     $answer_data = json_decode($answer_data);
-                                    $this->info($answer_data->data->message);
+                                    $this->info(isset($answer_data->data->message) ? $answer_data->data->message : '');
                                 }
                             }
                         }
                         $answer_res_data = self::curl('http://huai.huaishutech.com/v1.2/api/games/house/'.$question_id.'/finished',[],'get');
                         $answer_res_data = json_decode($answer_res_data);
-                        $this->info($answer_res_data->data->data->message);
+                        $this->info(isset($answer_res_data->data->data->message) ? $answer_res_data->data->data->message : '');
                     }
                 } else {
                     $this->info('任务已达上限');
